@@ -1,0 +1,98 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "type": "string",
+            "defaultValue": "kudos",
+            "metadata": {
+                "description": "Prefix for all deployed resources"
+            }
+        }
+    },
+    "variables": {
+        "appInsightsName": "[concat(parameters('appName'), '-insights')]",
+        "hostingPlanName": "[concat(parameters('appName'), '-app-plan')]",
+        "spaAppStorage": "[concat(parameters('appName'), 'spa', uniqueString(resourceGroup().Id))]",
+        "spaName": "[concat(parameters('appName'), '-spa-', uniqueString(resourceGroup().Id))]",
+        "spaSourceGit": "https://github.com/azurecz/kudos-frontend-code.git"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Insights/components",
+            "name": "[variables('appInsightsName')]",
+            "comments": "Application Insights for production APIM",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ApplicationId": "[variables('appInsightsName')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2015-04-01",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[variables('hostingPlanName')]",
+                "sku": "Basic",
+                "workerSize": 0,
+                "numberOfWorkers": 1
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('spaAppStorage')]",
+            "apiVersion": "2016-12-01",
+            "location": "[resourceGroup().location]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "apiVersion": "2015-08-01",
+            "type": "Microsoft.Web/sites",
+            "name": "[variables('spaName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "app",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('spaAppStorage'))]",
+                "[variables('appInsightsName')]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "siteConfig": {
+                    "alwaysOn": true,
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~1"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2014-04-01').InstrumentationKey]"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "apiVersion": "2015-08-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites/', variables('spaName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[variables('spaSourceGit')]",
+                        "branch": "master",
+                        "IsManualIntegration": "true"
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {}
+}
