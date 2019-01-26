@@ -73,6 +73,10 @@
                         {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
                             "value": "10.6.0"
+                        },
+                        {
+                            "name": "SCM_COMMAND_IDLE_TIMEOUT",
+                            "value": "300"
                         }
                     ],
                     "virtualApplications": [
