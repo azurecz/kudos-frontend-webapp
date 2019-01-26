@@ -74,6 +74,14 @@
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
                             "value": "10.6.0"
                         }
+                    ],
+                    "virtualApplications": [
+                        {
+                            "virtualPath": "/",
+                            "physicalPath": "site\\wwwroot\\dist",
+                            "preloadEnabled": true,
+                            "virtualDirectories": null
+                        }
                     ]
                 }
             },
