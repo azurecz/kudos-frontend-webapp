@@ -90,6 +90,12 @@
                             "physicalPath": "site\\wwwroot\\dist",
                             "preloadEnabled": true,
                             "virtualDirectories": null
+                        },
+                        {
+                            "virtualPath": "/apim_url",
+                            "physicalPath": "site\\wwwroot\\apim_url",
+                            "preloadEnabled": true,
+                            "virtualDirectories": null
                         }
                     ]
                 }
