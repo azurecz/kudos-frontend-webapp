@@ -13,6 +13,7 @@
     "variables": {
         "appInsightsName": "[concat(parameters('appName'), '-insights')]",
         "hostingPlanName": "[concat(parameters('appName'), '-app-plan')]",
+        "apimName": "[concat(parameters('appName'), '-apim-', uniqueString(resourceGroup().Id))]",
         "spaAppStorage": "[concat(parameters('appName'), 'spa', uniqueString(resourceGroup().Id))]",
         "spaName": "[concat(parameters('appName'), '-spa-', uniqueString(resourceGroup().Id))]",
         "spaSourceGit": "https://github.com/azurecz/kudos-frontend-code.git"
@@ -77,6 +78,10 @@
                         {
                             "name": "SCM_COMMAND_IDLE_TIMEOUT",
                             "value": "300"
+                        },
+                        {
+                            "name": "APIM_URL",
+                            "value": "[concat('https://', variables('apimName'), '.azure-api.net')]"
                         }
                     ],
                     "virtualApplications": [
