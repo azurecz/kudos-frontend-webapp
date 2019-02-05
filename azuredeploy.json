@@ -8,6 +8,17 @@
             "metadata": {
                 "description": "Prefix for all deployed resources"
             }
+        },
+        "deploymentStyle": {
+            "type": "string",
+            "defaultValue": "GitOps",
+            "allowedValues": [
+                "GitOps",
+                "DevOps"
+            ],
+            "metadata": {
+                "description": "Choose deployment style. GitOps to push code directly from GitHub, DevOps if you want to use Azure DevOps to push code."
+            }
         }
     },
     "variables": {
@@ -103,6 +114,7 @@
             "resources": [
                 {
                     "apiVersion": "2015-08-01",
+                    "condition": "[equals(parameters('deploymentStyle'), 'GitOps')]",
                     "name": "web",
                     "type": "sourcecontrols",
                     "dependsOn": [
